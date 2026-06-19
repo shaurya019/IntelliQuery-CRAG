@@ -1,0 +1,1476 @@
+# IntelliQuery CRAG
+
+## Agentic + Corrective RAG AI Knowledge Assistant
+
+**IntelliQuery CRAG** is a full-stack **Agentic + Corrective Retrieval-Augmented Generation (CRAG)** application that helps users upload documents and get accurate, verified, source-backed answers from them.
+
+It is not just a normal PDF chatbot.  
+It is a production-grade AI knowledge assistant that can:
+
+- Retrieve relevant information from uploaded documents
+- Grade whether retrieved documents are actually useful
+- Correct poor retrieval using query rewriting or fallback search
+- Use agentic decision-making with LangGraph
+- Generate grounded answers with source citations
+- Show confidence scores and retrieval transparency
+- Support multi-session chat and user-specific document workspaces
+
+---
+
+## Project Tagline
+
+> **An Agentic + Corrective RAG assistant that retrieves, verifies, corrects, and answers using trusted sources.**
+
+---
+
+## Simple Explanation
+
+The core idea is simple:
+
+```text
+User uploads documents
+        ↓
+System extracts and stores knowledge
+        ↓
+User asks a question
+        ↓
+System retrieves the most relevant document chunks
+        ↓
+CRAG checks whether those chunks are actually relevant
+        ↓
+If relevant, it generates the answer
+        ↓
+If not relevant, it rewrites the query, retrieves again, or uses fallback tools
+        ↓
+User gets an answer with sources and confidence score
+```
+
+---
+
+## Purpose of the Project
+
+The purpose of **IntelliQuery CRAG** is to turn scattered documents into a reliable AI assistant that can answer questions accurately using uploaded knowledge.
+
+Many companies have information spread across:
+
+- PDFs
+- HR policies
+- Product documentation
+- Technical documentation
+- Legal contracts
+- SOPs
+- Support documents
+- Research papers
+- Meeting notes
+- Internal knowledge bases
+
+Instead of manually searching through many documents, users can simply ask questions in natural language.
+
+Example:
+
+```text
+User: What is the maternity leave policy?
+```
+
+The system can answer:
+
+```text
+Employees are eligible for 26 weeks of maternity leave.
+
+Source:
+HR Policy Handbook.pdf — Page 14
+
+Confidence: 92%
+```
+
+---
+
+## What Makes This Project Special?
+
+A normal RAG chatbot usually works like this:
+
+```text
+Retrieve top chunks → Send chunks to LLM → Generate answer
+```
+
+The problem with this approach is that the retrieved chunks may be irrelevant or incomplete, but the LLM may still produce an answer.
+
+**IntelliQuery CRAG** improves this by adding correction and agentic reasoning.
+
+```text
+Retrieve
+↓
+Grade relevance
+↓
+Correct retrieval if needed
+↓
+Re-rank sources
+↓
+Generate grounded answer
+↓
+Return citations and confidence
+```
+
+---
+
+## Key Differentiators
+
+### 1. Corrective RAG
+
+The system does not blindly trust retrieved documents.
+
+It checks:
+
+- Is the retrieved chunk relevant?
+- Does it answer the user’s question?
+- Is there enough evidence to generate an answer?
+- Should the query be rewritten?
+- Should retrieval be attempted again?
+- Should the system use fallback search?
+
+This reduces hallucination and improves answer quality.
+
+---
+
+### 2. Agentic RAG with LangGraph
+
+The project uses **LangGraph** to create a stateful agent workflow.
+
+The agent can decide:
+
+- When to retrieve documents
+- When to grade retrieved chunks
+- When to rewrite the query
+- When to use tools
+- When to generate the final answer
+- When to ask the user for clarification
+- When to stop and say there is not enough information
+
+Example workflow:
+
+```text
+Start
+  ↓
+Understand Query
+  ↓
+Retrieve Documents
+  ↓
+Grade Relevance
+  ↓
+Relevant?
+  ├── Yes → Generate Answer
+  └── No  → Rewrite Query → Retrieve Again
+                         ↓
+                   Still Weak?
+                         ↓
+                   Use Fallback Tool
+                         ↓
+                   Generate Final Answer
+```
+
+---
+
+### 3. Source Citations
+
+Every answer should include sources.
+
+Example:
+
+```text
+Answer:
+Employees get 12 casual leaves per year.
+
+Sources:
+1. HR Policy Handbook.pdf — Page 14 — 92% match
+2. Employee Benefits Guide.pdf — Page 6 — 84% match
+```
+
+This builds user trust and makes the system useful in real business environments.
+
+---
+
+### 4. Confidence Score
+
+The system can show a confidence score based on:
+
+- Retrieval similarity score
+- Relevance grade
+- Number of supporting sources
+- Re-ranking score
+- Answer groundedness
+- Fallback usage
+
+Example:
+
+```text
+Confidence: 91%
+
+Reason:
+The answer is supported by three highly relevant document chunks.
+```
+
+---
+
+### 5. Agent Flow Transparency
+
+The frontend can show how the agent reached the answer.
+
+Example:
+
+```text
+Agent Execution Flow:
+
+✅ Query understood
+✅ Retrieved 8 chunks from Pinecone
+✅ Graded relevance
+⚠️ First retrieval was weak
+✅ Query rewritten
+✅ Retrieved better chunks
+✅ Generated final answer with citations
+```
+
+This makes the project stand out from basic chatbot applications.
+
+---
+
+## Real-World Use Cases
+
+### HR Policy Assistant
+
+Employees can ask:
+
+```text
+How many casual leaves do I get?
+What is the maternity leave policy?
+What is the remote work policy?
+```
+
+---
+
+### Customer Support Assistant
+
+Support teams can ask:
+
+```text
+How do I troubleshoot payment failure?
+What are the refund conditions?
+How do I reset a customer account?
+```
+
+---
+
+### Legal Document Assistant
+
+Legal teams can ask:
+
+```text
+Which clause talks about data retention?
+What are the termination conditions?
+Compare this contract with the previous version.
+```
+
+---
+
+### Engineering Documentation Assistant
+
+Developers can ask:
+
+```text
+How do I deploy the backend to staging?
+What are the API authentication rules?
+Where is the database migration process documented?
+```
+
+---
+
+### Finance and Report Assistant
+
+Finance teams can ask:
+
+```text
+Summarize the Q1 financial report.
+Compare Q1 and Q2 revenue growth.
+What are the key cost drivers?
+```
+
+---
+
+### Research Paper Assistant
+
+Researchers can ask:
+
+```text
+Summarize this paper.
+What methodology was used?
+What are the limitations of the study?
+```
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- React
+- React Hooks
+- Component-based architecture
+- Clean chat UI
+- Multi-session sidebar
+- Source citation panel
+- Agent flow visualizer
+- Streaming response UI
+
+### Backend
+
+- FastAPI
+- Async REST APIs
+- Middleware
+- JWT authentication
+- Modular service architecture
+- Streaming via SSE or WebSocket
+
+### AI Layer
+
+- OpenAI GPT-4o / GPT-4o-mini
+- OpenAI embeddings
+- LangGraph for agent orchestration
+- Tool calling
+- Query rewriting
+- HyDE
+- Relevance grading
+- Self-reflection loop
+
+### Vector Database
+
+- Pinecone
+- Embedding storage
+- Vector search
+- Namespaces
+- Metadata filtering
+- Document chunk retrieval
+
+### Database
+
+Recommended: **PostgreSQL**
+
+Used for:
+
+- Users
+- Sessions
+- Chat history
+- Document metadata
+- Uploaded file metadata
+- Source references
+- Feedback
+- Audit logs
+
+### Optional Tools
+
+- Cohere Rerank
+- Cross-encoder reranker
+- Web search API
+- Calculator tool
+- SQL tool
+- Loguru
+- Docker
+- Render / Railway / AWS EC2
+- Vercel / Netlify
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart TD
+    User[User] --> React[React Frontend]
+    React --> API[FastAPI Backend]
+
+    API --> Auth[JWT Auth Middleware]
+    API --> SessionDB[(PostgreSQL)]
+    API --> Upload[Document Upload Service]
+
+    Upload --> Parser[Document Parser]
+    Parser --> Chunker[Text Chunker]
+    Chunker --> Embed[OpenAI Embeddings]
+    Embed --> Pinecone[(Pinecone Vector DB)]
+
+    API --> Graph[LangGraph Agent Workflow]
+
+    Graph --> Retrieve[Retrieve Documents]
+    Retrieve --> Pinecone
+    Retrieve --> Grade[Grade Relevance]
+
+    Grade --> Decision{Relevant?}
+    Decision -->|Yes| Rerank[Re-rank Chunks]
+    Decision -->|No| Rewrite[Rewrite Query]
+    Rewrite --> Retrieve
+
+    Decision -->|Fallback Needed| Tools[Tools: Web Search / Calculator / SQL]
+
+    Rerank --> Generate[Generate Answer]
+    Tools --> Generate
+
+    Generate --> Citations[Attach Sources + Confidence]
+    Citations --> React
+```
+
+---
+
+## Core RAG Flow
+
+```text
+Question
+   ↓
+Create query embedding
+   ↓
+Search Pinecone
+   ↓
+Retrieve top-k document chunks
+   ↓
+Grade relevance
+   ↓
+Re-rank best chunks
+   ↓
+Generate answer
+   ↓
+Return answer with citations
+```
+
+---
+
+## Corrective RAG Flow
+
+```text
+User Question
+      ↓
+Retrieve documents from Pinecone
+      ↓
+Grade retrieved documents
+      ↓
+Are documents relevant?
+      ├── Yes
+      │     ↓
+      │   Generate answer
+      │
+      └── No
+            ↓
+          Rewrite query
+            ↓
+          Retrieve again
+            ↓
+          Still weak?
+            ├── Use fallback search
+            └── Ask clarification / say not enough evidence
+```
+
+---
+
+## Agentic RAG Flow
+
+```text
+User asks question
+      ↓
+Agent analyzes intent
+      ↓
+Agent decides next action
+      ↓
+Possible actions:
+  - Retrieve documents
+  - Rewrite query
+  - Use web search
+  - Use calculator
+  - Query database
+  - Ask clarification
+  - Generate final answer
+      ↓
+Agent loops until answer is ready
+      ↓
+Final answer with sources
+```
+
+---
+
+## Main Features
+
+### Beginner Features
+
+- Basic React chat UI
+- FastAPI `/chat` endpoint
+- OpenAI simple Q&A
+- Document ingestion
+- Text chunking
+- OpenAI embeddings
+- Pinecone vector storage
+- Basic retrieval
+- Source display
+
+---
+
+### Intermediate Features
+
+- Corrective RAG pipeline
+- LLM-based document relevance grading
+- LangGraph retrieve → grade → generate workflow
+- Query rewriting
+- Fallback retrieval
+- PostgreSQL chat history
+- User sessions
+- Streaming response
+- Source citations
+
+---
+
+### Advanced Features
+
+- Full Agentic RAG with LangGraph
+- Conditional graph edges
+- Tool calling
+- Web search fallback
+- Calculator tool
+- SQL/PostgreSQL tool
+- Re-ranking
+- HyDE
+- Self-reflection loop
+- Multi-agent collaboration
+- JWT authentication
+- Role-based access control
+- Multi-session management
+- Confidence score
+- Source citation UI
+- Agent flow visualizer
+
+---
+
+### Deployment Features
+
+- Dockerized FastAPI backend
+- React production build
+- Backend deployment to Render, Railway, or AWS EC2
+- Frontend deployment to Vercel or Netlify
+- Pinecone production index
+- Environment config management
+- Logging with Loguru
+- Error monitoring
+- Cost and latency tracking
+
+---
+
+## Suggested UI Screens
+
+### 1. Landing Dashboard
+
+Purpose:
+
+- Explain the product
+- Show key features
+- Show tech stack
+- Allow user to start a new chat
+
+Sections:
+
+- Project name
+- Tagline
+- Key features
+- Upload document button
+- Start chat button
+
+---
+
+### 2. Document Upload Workspace
+
+Purpose:
+
+Allow users to upload and manage documents.
+
+Features:
+
+- Upload PDF, DOCX, TXT, CSV, PPTX
+- Show upload progress
+- Show processing status
+- Show number of chunks
+- Show embedding status
+- Delete document
+- Re-index document
+- Group documents by workspace/project
+
+Example:
+
+```text
+Document: HR_Policy.pdf
+Status: Indexed
+Chunks: 148
+Uploaded by: User
+Last updated: 19 June 2026
+```
+
+---
+
+### 3. Agentic Chat UI
+
+Purpose:
+
+Allow users to ask questions and receive source-backed answers.
+
+Features:
+
+- Chat interface
+- Streaming response
+- Source citations
+- Confidence score
+- Suggested follow-up questions
+- Feedback buttons
+- Tool usage indicators
+
+---
+
+### 4. Source Citation Panel
+
+Purpose:
+
+Show which documents were used to generate the answer.
+
+Example:
+
+```text
+Sources Used:
+
+1. HR Policy Handbook.pdf
+   Page: 14
+   Match Score: 92%
+   Used for: Leave policy
+
+2. Employee Benefits Guide.pdf
+   Page: 6
+   Match Score: 84%
+   Used for: Eligibility rules
+```
+
+---
+
+### 5. Agent Flow Visualizer
+
+Purpose:
+
+Show the internal reasoning path of the agent.
+
+Example:
+
+```text
+✅ Query understood
+✅ Retrieved 8 chunks
+✅ Relevance graded
+⚠️ Query rewritten
+✅ Retrieved better chunks
+✅ Answer generated
+```
+
+---
+
+### 6. Admin Analytics Dashboard
+
+Purpose:
+
+Help admins monitor usage and quality.
+
+Metrics:
+
+- Total queries
+- Successful answers
+- Failed retrievals
+- Average confidence
+- Average latency
+- Token usage
+- Cost per query
+- Most used documents
+- Most asked questions
+- Low-confidence queries
+
+---
+
+## Additional Features to Add
+
+### 1. Multi-Session Chat
+
+Allow users to create and manage multiple chat sessions.
+
+Features:
+
+- New chat
+- Rename chat
+- Delete chat
+- Continue old conversation
+- Search previous chats
+
+---
+
+### 2. Suggested Questions
+
+After upload, generate suggested questions automatically.
+
+Example:
+
+```text
+You uploaded HR Policy.pdf
+
+Suggested questions:
+1. What is the leave policy?
+2. What is the remote work policy?
+3. What is the reimbursement process?
+4. What are the employee benefits?
+```
+
+---
+
+### 3. Document Summarization
+
+After upload, generate:
+
+- Short summary
+- Key points
+- Important dates
+- Risks
+- Action items
+- FAQ
+
+---
+
+### 4. Document Comparison
+
+Allow users to compare two documents.
+
+Example:
+
+```text
+Compare old_leave_policy.pdf and new_leave_policy.pdf
+```
+
+Possible answer:
+
+```text
+Main changes:
+1. Casual leave increased from 10 to 12 days.
+2. Sick leave increased from 8 to 12 days.
+3. Maternity leave remains 26 weeks.
+```
+
+---
+
+### 5. User Feedback System
+
+After every answer, show:
+
+```text
+👍 Helpful
+👎 Not helpful
+```
+
+If the user clicks negative feedback, ask:
+
+- Wrong answer
+- Missing source
+- Irrelevant source
+- Too long
+- Not enough detail
+
+Store this feedback in PostgreSQL.
+
+---
+
+### 6. Human-in-the-Loop Review
+
+For low-confidence answers, allow human review.
+
+Example:
+
+```text
+This answer has low confidence. Send for human review?
+```
+
+Useful for:
+
+- Legal documents
+- Medical policies
+- Financial documents
+- Compliance documents
+
+---
+
+### 7. Role-Based Access Control
+
+Roles:
+
+- Admin
+- Manager
+- User
+- Viewer
+
+Example:
+
+```text
+Admin can upload/delete documents
+Manager can view team documents
+User can ask questions
+Viewer can only read answers
+```
+
+---
+
+### 8. Document-Level Permissions
+
+Restrict access to specific documents.
+
+Examples:
+
+```text
+HR documents → HR team only
+Finance documents → Finance team only
+Engineering docs → Engineering team only
+Public docs → Everyone
+```
+
+Possible metadata:
+
+```json
+{
+  "tenant_id": "company_123",
+  "department": "hr",
+  "visibility": "restricted",
+  "uploaded_by": "user_456"
+}
+```
+
+---
+
+### 9. Evaluation Dashboard
+
+Track RAG quality.
+
+Metrics:
+
+- Retrieval precision
+- Answer groundedness
+- User feedback
+- Average confidence
+- Fallback rate
+- Hallucination rate
+- Latency
+- Token usage
+- Cost per query
+
+Example:
+
+```text
+Total queries: 1,248
+Successful answers: 89%
+Fallback triggered: 12%
+Average confidence: 86%
+Average latency: 2.3s
+Average cost/query: $0.004
+```
+
+---
+
+### 10. Cost and Latency Tracking
+
+Track:
+
+- Tokens per request
+- Embedding cost
+- Generation cost
+- Re-ranking cost
+- Average latency
+- Slowest queries
+- Cost per user
+- Cost per workspace
+
+---
+
+## Database Design
+
+### users
+
+Stores user account information.
+
+```text
+id
+name
+email
+password_hash
+role
+created_at
+updated_at
+```
+
+---
+
+### chat_sessions
+
+Stores user chat sessions.
+
+```text
+id
+user_id
+title
+created_at
+updated_at
+```
+
+---
+
+### messages
+
+Stores conversation history.
+
+```text
+id
+session_id
+role
+content
+sources
+confidence_score
+created_at
+```
+
+---
+
+### documents
+
+Stores uploaded document metadata.
+
+```text
+id
+user_id
+workspace_id
+file_name
+file_type
+storage_path
+status
+chunk_count
+created_at
+updated_at
+```
+
+---
+
+### document_chunks
+
+Stores chunk metadata.
+
+```text
+id
+document_id
+pinecone_vector_id
+chunk_index
+text_preview
+page_number
+metadata
+created_at
+```
+
+---
+
+### feedback
+
+Stores user feedback on answers.
+
+```text
+id
+message_id
+user_id
+rating
+reason
+comment
+created_at
+```
+
+---
+
+### audit_logs
+
+Stores important system events.
+
+```text
+id
+user_id
+action
+metadata
+created_at
+```
+
+---
+
+## Recommended Folder Structure
+
+```text
+intelliquery-crag/
+  backend/
+    app/
+      api/
+        routes/
+          chat.py
+          upload.py
+          sessions.py
+          auth.py
+          documents.py
+
+      core/
+        config.py
+        security.py
+        logging.py
+
+      db/
+        base.py
+        session.py
+        models.py
+        repositories/
+
+      schemas/
+        chat.py
+        documents.py
+        auth.py
+
+      services/
+        document_loader.py
+        chunking.py
+        embeddings.py
+        pinecone_service.py
+        reranker.py
+        web_search.py
+        calculator.py
+
+      graphs/
+        crag_graph.py
+        agentic_rag_graph.py
+        nodes/
+          retrieve.py
+          grade.py
+          rewrite.py
+          generate.py
+          tools.py
+
+      prompts/
+        grade_prompt.py
+        rewrite_prompt.py
+        answer_prompt.py
+
+      main.py
+
+    tests/
+    Dockerfile
+    requirements.txt
+    .env.example
+
+  frontend/
+    src/
+      components/
+        chat/
+        documents/
+        layout/
+        sources/
+        agent-flow/
+
+      pages/
+        Dashboard.jsx
+        Chat.jsx
+        Documents.jsx
+        Login.jsx
+
+      hooks/
+        useChat.js
+        useSessions.js
+        useDocuments.js
+
+      services/
+        api.js
+        auth.js
+
+      App.jsx
+      main.jsx
+
+    package.json
+    Dockerfile
+    .env.example
+
+  docker-compose.yml
+  README.md
+```
+
+---
+
+## Phase-Wise Roadmap
+
+## Phase 1 — Beginner
+
+Goal:
+
+Build a simple full-stack RAG application.
+
+Features:
+
+- FastAPI backend
+- `/chat` endpoint
+- OpenAI integration
+- React chat UI
+- Basic document ingestion
+- Pinecone vector search
+
+Flow:
+
+```text
+User question → Retrieve chunks → Generate answer
+```
+
+Deliverables:
+
+- Working backend
+- Working frontend
+- Basic document ingestion
+- Basic RAG answer
+- Source display
+
+---
+
+## Phase 2 — Intermediate
+
+Goal:
+
+Add Corrective RAG and LangGraph.
+
+Features:
+
+- LangGraph workflow
+- Retrieve node
+- Grade relevance node
+- Generate answer node
+- Query rewrite node
+- Fallback retrieval
+- PostgreSQL chat history
+- Streaming response
+
+Flow:
+
+```text
+Retrieve → Grade → Generate
+              ↓
+        Rewrite if weak
+```
+
+Deliverables:
+
+- CRAG graph
+- Chat history persistence
+- Streaming UI
+- Relevance scoring
+- Corrective fallback
+
+---
+
+## Phase 3 — Advanced
+
+Goal:
+
+Build a full Agentic RAG system.
+
+Features:
+
+- Tool calling
+- Web search
+- Calculator
+- SQL tool
+- Re-ranking
+- HyDE
+- Self-reflection
+- Multi-agent collaboration
+- JWT auth
+- Multi-session UI
+- Source citations
+- Confidence score
+
+Flow:
+
+```text
+Agent decides → Retrieve / Tool / Rewrite / Generate
+```
+
+Deliverables:
+
+- Full agent workflow
+- User authentication
+- Multi-session chat
+- Advanced retrieval quality
+- Production-style UI
+
+---
+
+## Phase 4 — Deployment
+
+Goal:
+
+Deploy the application.
+
+Features:
+
+- Dockerized backend
+- Dockerized frontend
+- PostgreSQL database
+- Pinecone production index
+- Environment configuration
+- Logging
+- Monitoring
+- Error tracking
+
+Deployment options:
+
+Backend:
+
+- Render
+- Railway
+- AWS EC2
+- AWS ECS
+
+Frontend:
+
+- Vercel
+- Netlify
+- AWS Amplify
+
+Database:
+
+- Supabase PostgreSQL
+- Neon PostgreSQL
+- Railway PostgreSQL
+- AWS RDS
+
+---
+
+## Example User Flow
+
+```text
+1. User signs in.
+2. User uploads HR Policy PDF.
+3. Backend extracts text from the PDF.
+4. Text is split into chunks.
+5. Embeddings are created using OpenAI.
+6. Vectors are stored in Pinecone.
+7. Metadata is stored in PostgreSQL.
+8. User asks: "How many casual leaves do I get?"
+9. LangGraph starts the CRAG workflow.
+10. Pinecone retrieves relevant chunks.
+11. LLM grades chunk relevance.
+12. Re-ranker selects best chunks.
+13. LLM generates final answer.
+14. Answer is returned with sources and confidence score.
+15. Chat history is saved.
+```
+
+---
+
+## Example Answer Format
+
+```text
+Employees are eligible for 12 casual leaves per year.
+
+Sources:
+1. HR Policy Handbook.pdf — Page 14 — 92% match
+2. Employee Benefits Guide.pdf — Page 6 — 84% match
+
+Confidence: 91%
+
+Reason:
+The answer is supported by highly relevant sections from two HR policy documents.
+```
+
+---
+
+## Production Considerations
+
+### Security
+
+- Use JWT authentication
+- Hash passwords with bcrypt
+- Validate uploaded files
+- Restrict file types
+- Add file size limits
+- Sanitize extracted text
+- Use role-based permissions
+- Use document-level access control
+
+---
+
+### Reliability
+
+- Add retries for OpenAI and Pinecone calls
+- Use request timeouts
+- Add structured error handling
+- Store failed ingestion jobs
+- Add background workers for document processing
+- Use health check endpoints
+
+---
+
+### Observability
+
+- Use Loguru for structured logs
+- Track request IDs
+- Log latency
+- Log token usage
+- Log retrieval scores
+- Log fallback events
+- Monitor failed queries
+- Add error monitoring
+
+---
+
+### Cost Control
+
+- Use cheaper models for grading
+- Use GPT-4o-mini for simple tasks
+- Use GPT-4o for complex final answers
+- Cache embeddings
+- Avoid re-embedding unchanged documents
+- Limit retrieved chunks
+- Track token usage per user
+
+---
+
+### RAG Quality
+
+- Use metadata filters
+- Use query rewriting
+- Use HyDE
+- Use re-ranking
+- Use relevance grading
+- Evaluate groundedness
+- Store user feedback
+- Monitor low-confidence answers
+
+---
+
+## Common Pitfalls
+
+### 1. Bad Chunking
+
+If chunks are too small, the model loses context.  
+If chunks are too large, retrieval becomes noisy.
+
+Recommended approach:
+
+- Start with 500–1000 tokens per chunk
+- Use overlap between chunks
+- Preserve page number and document metadata
+
+---
+
+### 2. Blindly Trusting Vector Search
+
+Vector search may retrieve semantically similar but irrelevant chunks.
+
+Solution:
+
+- Add relevance grading
+- Add re-ranking
+- Use metadata filtering
+- Use query rewriting
+
+---
+
+### 3. No Source Citations
+
+Without sources, users cannot trust the answer.
+
+Solution:
+
+- Always return document name
+- Return page number if available
+- Return chunk score
+- Show exact source snippets
+
+---
+
+### 4. No Fallback
+
+If retrieval fails, a basic chatbot may hallucinate.
+
+Solution:
+
+- Say not enough evidence
+- Rewrite query
+- Retrieve again
+- Use web search if allowed
+- Ask clarification
+
+---
+
+### 5. No Evaluation
+
+Without evaluation, you cannot improve the system.
+
+Solution:
+
+Track:
+
+- Retrieval precision
+- Answer relevance
+- Groundedness
+- Hallucination rate
+- Feedback score
+- Latency
+- Cost
+
+---
+
+## Portfolio Positioning
+
+Use this description in your resume or GitHub profile:
+
+> Built **IntelliQuery CRAG**, a production-grade Agentic + Corrective RAG platform using React, FastAPI, OpenAI, LangGraph, Pinecone, and PostgreSQL. The system allows users to upload documents, retrieve relevant knowledge, grade document relevance, correct poor retrieval, use fallback tools, and generate source-backed answers with confidence scores and citations.
+
+Short version:
+
+> Developed an Agentic CRAG AI knowledge assistant that retrieves, verifies, corrects, and answers questions from private documents using LangGraph, OpenAI, Pinecone, FastAPI, React, and PostgreSQL.
+
+---
+
+## One-Line Summary
+
+**IntelliQuery CRAG turns private documents into a trusted AI assistant that can retrieve, verify, correct, and answer with sources.**
+
+---
+
+## Future Enhancements
+
+- Multi-tenant SaaS workspace
+- Team-based document access
+- Slack/Teams integration
+- Gmail/Google Drive ingestion
+- Notion/Confluence ingestion
+- Voice-based document Q&A
+- Advanced admin analytics
+- Human approval workflow
+- Prompt versioning
+- Automated RAG evaluation pipeline
+- CI/CD deployment pipeline
+- Enterprise SSO
+- Audit-ready compliance logs
+
+---
+
+## License
+
+This project can be released under the MIT License for open-source portfolio use.
+
+---
+
+## Author
+
+Built as a full-stack AI engineering portfolio project focused on:
+
+- Agentic AI
+- Corrective RAG
+- LangGraph
+- FastAPI
+- React
+- Pinecone
+- PostgreSQL
+- OpenAI
+- Production AI architecture
