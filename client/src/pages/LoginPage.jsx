@@ -1,17 +1,28 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Bot, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
-import { useLoginMutation } from "../hooks/useAuthMutations.js";
+import { useSelector } from "react-redux";
+import {
+  useHealthCheck,
+  useLoginMutation
+} from "../hooks/useAuthMutations.js";
+import { selectIsAuthenticated } from "../features/auth/authSlice.js";
 import Spinner from "../components/ui/Spinner.jsx";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const loginMutation = useLoginMutation();
+  const healthQuery = useHealthCheck();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [form, setForm] = useState({
-    email: "alex@example.com",
-    password: "password"
+    email: "",
+    password: ""
   });
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -133,9 +144,21 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-slate-500">
-            Demo login: use any email and password.
-          </p>
+          <div className="mt-6 flex items-center justify-between gap-3 text-sm text-slate-500">
+            <p>
+              New here?{" "}
+              <Link to="/register" className="font-bold text-blue-600 hover:text-blue-700">
+                Create an account
+              </Link>
+            </p>
+            <p
+              className={`font-semibold ${
+                healthQuery.isError ? "text-amber-600" : "text-emerald-600"
+              }`}
+            >
+              {healthQuery.isError ? "Backend unavailable" : "Backend connected"}
+            </p>
+          </div>
         </div>
       </section>
     </main>

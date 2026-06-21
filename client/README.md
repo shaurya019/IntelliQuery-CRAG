@@ -8,13 +8,12 @@ A complete runnable React + TailwindCSS frontend for an Agentic + Corrective RAG
 - TailwindCSS light-mode UI
 - Redux Toolkit for client/global UI state
 - TanStack Query for async server/cache state
-- Login and logout flow
+- Login, register, and session restore flow
 - Protected dashboard route
 - Responsive layout
-- Document upload and delete
-- Local mock document indexing
+- Backend API integration for auth, documents, sessions, and chat
+- Document upload and ingestion trigger
 - Multi-session chat
-- Mock CRAG answer generation
 - Retrieval pipeline display
 - Source citation panel
 - Confidence score
@@ -32,17 +31,6 @@ Open:
 
 ```bash
 http://localhost:5173
-```
-
-## Demo login
-
-Use any email and password.
-
-Example:
-
-```text
-Email: alex@example.com
-Password: password
 ```
 
 ## Frontend architecture
@@ -65,9 +53,8 @@ src/
     useMessages.js
 
   services/
-    mockApi.js
-    storage.js
-    ragEngine.js
+    apiClient.js
+    backendApi.js
 
   components/
     layout/
@@ -79,6 +66,7 @@ src/
 
   pages/
     LoginPage.jsx
+    RegisterPage.jsx
     DashboardPage.jsx
 ```
 
@@ -103,30 +91,29 @@ Used for server/cache state:
 - Documents
 - Chat sessions
 - Messages
-- Mutations for upload, delete, create session, send message
+- Mutations for register, login, upload, create session, and send message
 
 This is the recommended split because server data should not be manually duplicated in Redux unless necessary.
 
-## Backend integration later
-
-Currently the app runs fully using a local mock API backed by localStorage.
-
-Later, replace `src/services/mockApi.js` with real FastAPI calls:
+## Backend endpoints wired
 
 ```text
-POST /auth/login
-POST /auth/logout
-GET  /documents
-POST /documents/upload
-DELETE /documents/:id
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+GET  /api/v1/auth/me
 
-GET  /sessions
-POST /sessions
-DELETE /sessions/:id
+POST /api/v1/documents/register-s3-and-ingest
+GET  /api/v1/documents
+GET  /api/v1/documents/{document_id}
+GET  /api/v1/ingestion/jobs/{job_id}
 
-GET  /sessions/:id/messages
-POST /sessions/:id/messages
-POST /chat
+POST /api/v1/sessions
+GET  /api/v1/sessions
+
+POST /api/v1/chat
+GET  /api/v1/sessions/{session_id}/messages
+
+GET  /api/v1/health
 ```
 
 ## Light mode only

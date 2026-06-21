@@ -1,12 +1,14 @@
-import { FileText, Filter, FolderOpen, Plus, Search, Server, Trash2, UploadCloud } from "lucide-react";
+import { FileText, Filter, FolderOpen, Plus, UploadCloud } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  markDocumentOpened,
   selectDocumentSearch,
+  selectDocumentStatusFilter,
   setDocumentSearch,
-  setSelectedDocumentId
-} from "../../features/ui/uiSlice.js";
-import { useDeleteDocument, useDocuments, useUploadDocuments } from "../../hooks/useDocuments.js";
+  setDocumentStatusFilter
+} from "../../features/documents/documentsSlice.js";
+import { useDocuments, useUploadDocuments } from "../../hooks/useDocuments.js";
 import Spinner from "../ui/Spinner.jsx";
 
 function formatBytes(bytes = 0) {
@@ -18,17 +20,23 @@ function formatBytes(bytes = 0) {
 export default function DocumentLibrary() {
   const dispatch = useDispatch();
   const search = useSelector(selectDocumentSearch);
+  const statusFilter = useSelector(selectDocumentStatusFilter);
   const fileInputRef = useRef(null);
 
   const { data: documents = [], isLoading } = useDocuments();
   const uploadMutation = useUploadDocuments();
-  const deleteMutation = useDeleteDocument();
 
   const filteredDocuments = useMemo(() => {
     const value = search.trim().toLowerCase();
-    if (!value) return documents;
-    return documents.filter((doc) => doc.name.toLowerCase().includes(value));
-  }, [documents, search]);
+
+    return documents.filter((doc) => {
+      const matchesSearch = !value || doc.name.toLowerCase().includes(value);
+      const matchesStatus =
+        statusFilter === "all" || doc.status?.toLowerCase() === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [documents, search, statusFilter]);
 
   const categories = useMemo(() => {
     const countByType = documents.reduce((acc, doc) => {
@@ -54,8 +62,10 @@ export default function DocumentLibrary() {
     event.target.value = "";
   }
 
-  const usedStorage = documents.reduce((sum, doc) => sum + (doc.size || 0), 0);
-  const storagePercent = Math.min(100, Math.round((usedStorage / (100 * 1024 * 1024)) * 100));
+  function handleOpenDocument(documentId) {
+    dispatch(markDocumentOpened(documentId));
+    window.open(`/documents/${documentId}`, "_blank", "noopener,noreferrer");
+  }
 
   return (
     <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-soft">
@@ -91,16 +101,25 @@ export default function DocumentLibrary() {
 
       <div className="mb-3 flex gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl bg-slate-100 px-3 py-2.5">
-          {/* <Search size={17} className="text-slate-400" /> */}
-          {/* <input
+          <input
             value={search}
             onChange={(event) => dispatch(setDocumentSearch(event.target.value))}
             className="w-full bg-transparent text-sm outline-none placeholder:text-slate-500"
             placeholder="Search documents..."
-          /> */}
+          />
         </div>
-        <button className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 text-slate-500 hover:bg-slate-50">
+        <button
+          className={`flex h-11 items-center justify-center rounded-2xl border px-3 text-sm font-semibold ${
+            statusFilter === "indexed"
+              ? "border-blue-200 bg-blue-50 text-blue-600"
+              : "border-slate-200 text-slate-500 hover:bg-slate-50"
+          }`}
+          onClick={() =>
+            dispatch(setDocumentStatusFilter(statusFilter === "indexed" ? "all" : "indexed"))
+          }
+        >
           <Filter size={17} />
+          <span className="ml-2 hidden sm:inline">Indexed</span>
         </button>
       </div>
 
@@ -137,7 +156,7 @@ export default function DocumentLibrary() {
             {filteredDocuments.map((doc) => (
               <div
                 key={doc.id}
-                className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition ${
+                className={`flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition ${
                   doc.active
                     ? "border-blue-200 bg-blue-50"
                     : "border-transparent hover:border-slate-200 hover:bg-slate-50"
@@ -145,7 +164,7 @@ export default function DocumentLibrary() {
               >
                 <button
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                  onClick={() => dispatch(setSelectedDocumentId(doc.id))}
+                  onClick={() => handleOpenDocument(doc.id)}
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-[10px] font-extrabold text-red-500">
                     {doc.type || <FileText size={14} />}
@@ -154,17 +173,9 @@ export default function DocumentLibrary() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-extrabold text-slate-900">{doc.name}</p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {doc.date} · {formatBytes(doc.size)}
+                      {doc.date} · {formatBytes(doc.size)} · {doc.status}
                     </p>
                   </div>
-                </button>
-
-                <button
-                  onClick={() => deleteMutation.mutate(doc.id)}
-                  className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-500 group-hover:flex"
-                  title="Delete document"
-                >
-                  <Trash2 size={15} />
                 </button>
               </div>
             ))}

@@ -1,9 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isMobileLibraryOpen: false,
-  documentSearch: "",
-  selectedDocumentId: null
+  isMobileLibraryOpen: false
 };
 
 const uiSlice = createSlice({
@@ -15,25 +13,12 @@ const uiSlice = createSlice({
     },
     closeMobileLibrary(state) {
       state.isMobileLibraryOpen = false;
-    },
-    setDocumentSearch(state, action) {
-      state.documentSearch = action.payload;
-    },
-    setSelectedDocumentId(state, action) {
-      state.selectedDocumentId = action.payload;
     }
   }
 });
 
-export const {
-  openMobileLibrary,
-  closeMobileLibrary,
-  setDocumentSearch,
-  setSelectedDocumentId
-} = uiSlice.actions;
+export const { openMobileLibrary, closeMobileLibrary } = uiSlice.actions;
 
 export const selectIsMobileLibraryOpen = (state) => state.ui.isMobileLibraryOpen;
-export const selectDocumentSearch = (state) => state.ui.documentSearch;
-export const selectSelectedDocumentId = (state) => state.ui.selectedDocumentId;
 
 export default uiSlice.reducer;

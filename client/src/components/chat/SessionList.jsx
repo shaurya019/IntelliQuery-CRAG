@@ -1,7 +1,7 @@
-import { MessageCircle, Plus, Trash2 } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectActiveSessionId, setActiveSessionId } from "../../features/chat/chatSlice.js";
-import { useCreateSession, useDeleteSession, useSessions } from "../../hooks/useSessions.js";
+import { useCreateSession, useSessions } from "../../hooks/useSessions.js";
 import Spinner from "../ui/Spinner.jsx";
 
 export default function SessionList() {
@@ -10,7 +10,6 @@ export default function SessionList() {
 
   const { data: sessions = [], isLoading } = useSessions();
   const createSession = useCreateSession();
-  const deleteSession = useDeleteSession();
 
   async function handleNewChat() {
     await createSession.mutateAsync("New Chat");
@@ -40,7 +39,7 @@ export default function SessionList() {
           {sessions.map((session) => (
             <div
               key={session.id}
-              className={`group flex items-center gap-2 rounded-2xl border px-3 py-2.5 ${
+              className={`flex items-center gap-2 rounded-2xl border px-3 py-2.5 ${
                 activeSessionId === session.id
                   ? "border-blue-200 bg-blue-50"
                   : "border-transparent hover:border-slate-200 hover:bg-slate-50"
@@ -54,13 +53,6 @@ export default function SessionList() {
                 <span className="truncate text-sm font-bold text-slate-800">
                   {session.title}
                 </span>
-              </button>
-
-              <button
-                className="hidden h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 group-hover:flex"
-                onClick={() => deleteSession.mutate(session.id)}
-              >
-                <Trash2 size={14} />
               </button>
             </div>
           ))}
